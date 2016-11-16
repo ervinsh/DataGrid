@@ -1,0 +1,40 @@
+<?php
+// module/Album/view/album/album/index.phtml:
+
+$title = 'Dishes';
+$this->headTitle($title);
+?>
+<h1><?= $this->escapeHtml($title) ?></h1>
+<p>
+    <a href="<?= $this->url('datagrid', ['action' => 'add']) ?>">Add new dish</a>
+</p>
+
+
+<table class="table">
+
+    <tr>
+        <th>Dish Name</th>
+        <th>Category</th>
+        <th>Description</th>
+        <th>image source</th>
+        <th>price</th>
+        <th>options</th>
+        <th>&nbsp;</th>
+    </tr>
+
+    <?php foreach ($dishes as $dish) : ?>
+        <tr>
+            <td><?= $this->escapeHtml($dish->dish_name) ?></td>
+            <td><?= $this->escapeHtml($dish->category) ?></td>
+            <td><?= $this->escapeHtml($dish->description) ?></td>
+            <td><?= $this->escapeHtml($dish->imageSrc) ?></td>
+            <td><?= $this->escapeHtml($dish->price) ?></td>
+            <td><?= $this->escapeHtml($dish->options) ?></td>
+            <td>
+                <a href="<?= $this->url('datagrid', ['action' => 'edit', 'id' => $dish->id]) ?>">Edit</a>
+                <a href="<?= $this->url('datagrid', ['action' => 'delete', 'id' => $dish->id]) ?>">Delete</a>
+            </td>
+        </tr>
+
+    <?php endforeach; ?>
+</table>
