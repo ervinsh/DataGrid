@@ -10,7 +10,9 @@ namespace DataGrid\Models;
 
 
 use Zend\Db\TableGateway\TableGatewayInterface;
+use Zend\Db\ResultSet\ResultSet ;
 use \RuntimeException;
+use Zend\Db\Sql\Where;
 
 class DataGridTable
 {
@@ -25,23 +27,37 @@ class DataGridTable
     {
         return $this->tableGateway->select();
     }
-/* features for filtration
+
     public function fetchSelected(Where $where)
     {
         return $this->tableGateway->select($where);
     }
 
+    /**
+     * @return array with types of columns field_name=>field_type
+     */
     public function getColumnTypes(){
+        $types = array();
 
+        //retrieving adapter and preparing statement
         $adapter = $this->tableGateway->getAdapter();
-        $statement = $adapter->createStatement('SHOW FULL COLUMNS FROM dishes');
-        $result    = $statement->execute();
+        $statement = $adapter->createStatement('SHOW COLUMNS FROM dishes;');
+        $statement->prepare();
 
-        var_dump($result->current());
-        die();
-        return $this->tableGateway->getColumns();
+        $result    = $statement->execute();
+        $resultSet = new ResultSet;
+        $resultSet->initialize($result);
+
+        $index =0;
+        foreach ($resultSet as $row){
+            $types[$index]['type'] = $row->getArrayCopy()['Type'];
+            $types[$index]['field'] = $row->getArrayCopy()['Field'];
+            $index++;
+        }
+
+        return $types;
     }
-*/
+
 
     public function getItem($id){
         $id = (int) $id;
