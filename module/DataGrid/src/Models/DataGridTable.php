@@ -10,6 +10,7 @@ namespace DataGrid\Models;
 
 
 use Zend\Db\TableGateway\TableGatewayInterface;
+use \RuntimeException;
 
 class DataGridTable
 {
@@ -24,6 +25,23 @@ class DataGridTable
     {
         return $this->tableGateway->select();
     }
+/* features for filtration
+    public function fetchSelected(Where $where)
+    {
+        return $this->tableGateway->select($where);
+    }
+
+    public function getColumnTypes(){
+
+        $adapter = $this->tableGateway->getAdapter();
+        $statement = $adapter->createStatement('SHOW FULL COLUMNS FROM dishes');
+        $result    = $statement->execute();
+
+        var_dump($result->current());
+        die();
+        return $this->tableGateway->getColumns();
+    }
+*/
 
     public function getItem($id){
         $id = (int) $id;

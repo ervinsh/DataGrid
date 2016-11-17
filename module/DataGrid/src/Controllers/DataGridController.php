@@ -26,8 +26,10 @@ class DataGridController extends AbstractActionController
 
     public function indexAction()
     {
+        $data = $this->table->fetchAll();
+
         return new ViewModel([
-            'dishes' =>$this->table->fetchAll()
+            'dishes' =>$data
         ]
     );
     }
@@ -116,5 +118,20 @@ class DataGridController extends AbstractActionController
             'id'=>$id,
             'dish'=>$this->table->getItem($id)
         ];
+    }
+
+    public function deleteselectedAction()
+    {
+        $ids = (array)$this->params()->fromPost('todo_with');
+
+        if(empty($ids)){
+            return $this->redirect()->toRoute('datagrid');
+        }
+
+        foreach($ids as $id){
+            $this->table->deleteItem($id);
+        }
+
+        return $this->redirect()->toRoute('datagrid');
     }
 }
