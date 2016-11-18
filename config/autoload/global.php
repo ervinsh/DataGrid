@@ -12,10 +12,5 @@
  */
 
 return [
-    'db' => [
-        'driver'   => 'Pdo_Mysql',
-        'database' => 'restaurant',
-        'username' =>'root',
-        'password'=>'password',
-    ],
+
 ];
