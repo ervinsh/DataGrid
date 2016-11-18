@@ -16,6 +16,7 @@ use DataGrid\Models\DataGridTable;
 use Zend\Db\Sql\Where;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use Zend\Json\Json;
 
 class DataGridController extends AbstractActionController
 {
@@ -195,6 +196,15 @@ class DataGridController extends AbstractActionController
         }
 
         return $this->redirect()->toRoute('datagrid');
+    }
+
+    public function exportJsonAction(){
+
+        $json = Json::encode($this->table->fetchAll());
+
+        return new ViewModel([
+            'json' => $json,
+        ]);
     }
 
 

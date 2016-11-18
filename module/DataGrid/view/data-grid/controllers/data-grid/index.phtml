@@ -1,8 +1,7 @@
 
 <?php
 
-use DataGrid\Forms\IndexForm;
-
+use Zend\Form\Form;
 $title = 'Dishes';
 $this->headTitle($title);
 ?>
@@ -49,12 +48,14 @@ $form->setName('Main form');
 $form->setAttribute('action',$this->url('datagrid',['action'=>'deleteselected']));
 $form->prepare();
 
+
 echo $this->form()->openTag($form);
 ?>
 <table class="table">
     <div>
         <?=$this->formSubmit($form->get('add_new'));?>
         <?=$this->formSubmit($form->get('delete_selected'));?>
+        <input  type="submit" name="add_new" id="add_new" class="btn btn-info" onclick="window.location.href='/datagrid/export-json' " form="action=''" value="Export All">
     </div>
     <tr>
         <th> </th>
