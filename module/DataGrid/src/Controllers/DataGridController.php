@@ -10,8 +10,10 @@ namespace DataGrid\Controllers;
 
 
 use DataGrid\Forms\DishForm;
+use DataGrid\Forms\IndexForm;
 use DataGrid\Models\DataGridItem;
 use DataGrid\Models\DataGridTable;
+use Zend\Db\Sql\Where;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 
@@ -26,13 +28,74 @@ class DataGridController extends AbstractActionController
 
     public function indexAction()
     {
-        $data = $this->table->fetchAll();
+        $form = $this->createFormWithFilter();
+        $request = $this->getRequest();
+        if(!$request->isPost()){
+
+            $data = $this->table->fetchAll();
+
+            return new ViewModel([
+                'dishes' => $data,
+                'form' => $form
+            ]);
+        }
+        //adding filtering elements
+        //todo: Think about decreasing number of for loops
+        $columnTypes = $this->table->getColumnTypes();
+        $paramTypes = array();
+        foreach ($columnTypes as $columnType) {
+            $paramTypes[$columnType['field']]=$columnType['type'];
+        }
+
+        $filterParams = $request->getPost()->getArrayCopy();
+        unset($filterParams['submit']);
+        $paramNames = array_keys($filterParams);
+
+        $where = $this->formWhereCondition($filterParams,$paramNames,$paramTypes);
+        $data = $this->table->fetchSelected($where);
 
         return new ViewModel([
-            'dishes' =>$data
-        ]
-    );
+            'dishes' => $data,
+            'form' => $form
+        ]);
+
+
+
     }
+
+    private function createFormWithFilter(){
+        $form = new IndexForm();
+
+        //adding filtering elements
+        $columnTypes = $this->table->getColumnTypes();
+        foreach($columnTypes as $column){
+            if($column['field']==='category'){
+                continue; //will set category control in view
+            }
+            $form->addElement($column['type'],$column['field'],'h',[]);
+        }
+        return $form;
+    }
+
+    private function formWhereCondition($filterParams, $paramNames, $paramTypes){
+        $where = new Where();
+        foreach($paramNames as $paramName){
+            if(strpos(strtolower($paramTypes[$paramName]),'varchar')!==false){
+                $where->like($paramName,strtolower('%'.$filterParams[$paramName].'%'));
+            }
+            if(strpos(strtolower($paramTypes[$paramName]),'int')!==false){
+                $where->in($paramName,$filterParams[$paramName]);
+            }
+            if(strpos(strtolower($paramTypes[$paramName]),'float')!==false){
+                if(empty($filterParams[$paramName])) continue;
+                $minmax = explode('-',$filterParams[$paramName]);
+                $where->between($paramName,$minmax[0],$minmax[1]);
+            }
+        }
+        return $where;
+    }
+
+
 
     public function addAction()
     {
@@ -80,7 +143,6 @@ class DataGridController extends AbstractActionController
         if(!$request->isPost()){
             return $viewData;
         }
-
 
         $form->setInputFilter($dish->getInputFilter());
 
@@ -134,4 +196,6 @@ class DataGridController extends AbstractActionController
 
         return $this->redirect()->toRoute('datagrid');
     }
+
+
 }

@@ -6,10 +6,46 @@ use DataGrid\Forms\IndexForm;
 $title = 'Dishes';
 $this->headTitle($title);
 ?>
-<h1><?= $this->escapeHtml($title) ?></h1>
+<h1 xmlns="http://www.w3.org/1999/html"><?= $this->escapeHtml($title) ?></h1>
+<table><tr><td valign="top">
 <?php
-$form = new IndexForm();
+$form->setName('filter');
+$oMultiCheckboxViewHelper = new \Zend\Form\View\Helper\FormMultiCheckbox();
+$oMultiCheckboxViewHelper->setSeparator('<br>');
+$form->addElement('category','category','Categories',['1'=>'1','2'=>'2','3'=>'3','4'=>'4','5'=>'5']);
+$form->get('dish_name')->setOptions(['label'=>'By Name']);
+$form->get('dish_name')->setAttribute('placeholder', 'Example: wine');
+$form->get('price')->setOptions(['label'=>'By Price']);
+$form->get('price')->setAttribute('placeholder', '0.00 - 9.99');
+$form->get('submit')->setValue('Filter');
+$form->setAttribute('action',$this->url('datagrid',['action'=>'index']));
+$form->prepare();
+?>
 
+<?= $this->form()->openTag($form)?>
+            <div class="form-group" >
+                <span><b>Categories:<b></span><br>
+                <?= $oMultiCheckboxViewHelper->render($form->get('category')); ?>
+            </div><br>
+
+            <div class="form-group">
+                <?= $this->formRow($form->get('dish_name'))?>
+                <br>
+                <?=$this->formRow($form->get('price'));?>
+            </div>
+
+<div class="form-group">
+    <?=$this->formSubmit($form->get('submit'));?>
+</div>
+<?= $this->form()->closeTag()?>
+</td>
+
+
+
+
+<td valign="top">
+<?php
+$form->setName('Main form');
 $form->setAttribute('action',$this->url('datagrid',['action'=>'deleteselected']));
 $form->prepare();
 
@@ -49,5 +85,5 @@ echo $this->form()->openTag($form);
     <?php endforeach; ?>
 </table>
 
-
 <?= $this->form()->closeTag()?>
+</td></tr></table>
